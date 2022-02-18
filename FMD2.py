@@ -32,7 +32,7 @@ def KeyGen(curve: Curve, numKeys=15):
     pk = PublicKey(numKeys)
 
     for i in range(numKeys):
-        randomNum = random.randrange(0, 9999999) # TODO: find out range for Zq!
+        randomNum = random.randrange(0, 9999999)  # TODO: find out range for Zq!
         sk.secKeys[i] = ECPrivateKey(randomNum, curve)
         pk.pubKeys[i] = sk.secKeys[i].get_public_key()
 
@@ -50,5 +50,10 @@ def Extract(sk: SecretKey, p: float):
 
 def Flag(pk: PublicKey, curve: Curve):
     pubKey = pk.pubKeys
-    r = random.randrange(0, 99999999) # TODO: find out range for Zq!
-    pass # TODO: implement me!
+    r = random.randrange(0, 99999999)  # TODO: find out range for Zq!
+    pass  # TODO: implement me!
+
+
+def Test(dsk, m):
+    # TODO: implement me!
+    pass
