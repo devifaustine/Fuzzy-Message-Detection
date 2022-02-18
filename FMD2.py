@@ -3,12 +3,12 @@ import math
 import random
 from ecpy.curves import Curve, Point
 from ecpy.keys import ECPrivateKey
+import hashlib
 
 
 class PublicKey:
     numKeys: int
     pubKeys: list
-    generator: int
 
     def __init__(self, num=0, pub=None):
         if pub is None:
@@ -70,10 +70,13 @@ def Flag(pk: PublicKey, curve: Curve):
     wx, wy = curve.mul_point(z, generator)
 
     c = []
+    k = []
 
     # gamma is set to 15
     for i in range(15):
-        # TODO: implement me! find out which python lib for SHA256
+        h = pow(pubKey[i], r)  # TODO: this is still wrong! need to use the curve
+        k[i] = hash_h(curve, ux, uy, h, wx, wy)
+        c[i] = k[i] ^ 1 # TODO: Fix this! bitwise xor
     pass
 
 
@@ -82,8 +85,16 @@ def Test(dsk: SecretKey, m) -> bool:
     # TODO: implement me!
     pass
 
-def hash_h():
-    pass # TODO: implement me!
+
+def encrypt_string(hash_string):
+    sha_signature = hashlib.sha256(hash_string.encode()).hexdigest()
+    return sha_signature
+
+
+def hash_h(curve: Curve, ux: int, uy: int, h: int, wx: int, wy: int):
+    string = str(ux) + str(uy) + str(h) + str(wx) + str(wy)
+    return encrypt_string(string)
+
 
 def hash_g():
-    pass # TODO: implement me!
+    pass  # TODO: implement me!
