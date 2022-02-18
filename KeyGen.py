@@ -1,11 +1,9 @@
 # implement client of FMD scheme
 from ctypes import c_uint32
 
-from ecpy.curves import Curve, Point
-from ecpy.keys import ECPublicKey, ECPrivateKey
-from ecpy.ecdsa import ECDSA
+from ecpy.curves import Curve
+from ecpy.keys import ECPrivateKey
 import random
-from dataclasses import dataclass
 import ctypes
 
 
@@ -55,7 +53,7 @@ def keyGen(curve: Curve, numKeys: int):
 
     # generate each public and secret key
     for i in range(numKeys):
-        randomNum = random.randrange(0, 9999999)  # di implementasi randomNum nya gede (bigInt)
+        randomNum = random.randrange(0, 9999999)
         priv.secKeys[i] = ECPrivateKey(randomNum, curve)
         pub.pubKeys[i] = priv.secKeys[i].get_public_key()
     print(priv.secKeys)
