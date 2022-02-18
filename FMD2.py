@@ -74,9 +74,12 @@ def Flag(pk: PublicKey, curve: Curve):
 
     # gamma is set to 15
     for i in range(15):
-        h = pow(pubKey[i], r)  # TODO: this is still wrong! need to use the curve
-        k[i] = hash_h(curve, ux, uy, h, wx, wy)
-        c[i] = k[i] ^ 1 # TODO: Fix this! bitwise xor
+        # according to GO implementation h = u^{sk_i}
+        hx, hy = curve.mul_point(pubKey[i], Point(ux, uy, curve))
+        k[i] = hash_h(curve, ux, uy, hx, hy, wx, wy)
+        c[i] = k[i] ^ 1
+
+    m = hash_g(ux, uy, c)
     pass
 
 
@@ -86,15 +89,17 @@ def Test(dsk: SecretKey, m) -> bool:
     pass
 
 
-def encrypt_string(hash_string):
-    sha_signature = hashlib.sha256(hash_string.encode()).hexdigest()
+def encrypt_string(hash_string) -> bytes:
+    sha_signature = hashlib.sha256(hash_string.encode()).digest()
     return sha_signature
 
 
-def hash_h(curve: Curve, ux: int, uy: int, h: int, wx: int, wy: int):
-    string = str(ux) + str(uy) + str(h) + str(wx) + str(wy)
-    return encrypt_string(string)
+def hash_h(curve: Curve, ux: int, uy: int, hx: int, hy: int, wx: int, wy: int):
+    string = str(ux) + str(uy) + str(hx) + str(hy) + str(wx) + str(wy)
+    # returns a single bit of the resulting hash
+    return encrypt_string(string)[0] & 0x01
 
 
-def hash_g():
-    pass  # TODO: implement me!
+def hash_g(ux: int, uy: int, c: list) -> int:
+    # returns an integer in range(0, group order - 1)
+    return 0  # TODO: implement me!
