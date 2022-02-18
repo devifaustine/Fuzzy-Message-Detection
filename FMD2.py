@@ -27,6 +27,7 @@ class SecretKey:
         self.secKeys = sec
 
 
+# generates a public and private key pair
 def KeyGen(curve: Curve, numKeys=15):
     sk = SecretKey(numKeys)
     pk = PublicKey(numKeys)
@@ -39,21 +40,25 @@ def KeyGen(curve: Curve, numKeys=15):
     return sk, pk
 
 
+# generates detection key (dsk) from a secret key and false positive rate p
 def Extract(sk: SecretKey, p: float):
     # p = false positive rate in form 2^(-n) with 0 <= n <= gamma (15).
     n = int(math.log(1 / p, 2))
     result = []
     for i in range(n):
         result.append(sk.secKeys[i])
-    return result
+    dsk = SecretKey(n, result)
+    return dsk
 
 
+# generates ciphertext on input public key
 def Flag(pk: PublicKey, curve: Curve):
     pubKey = pk.pubKeys
     r = random.randrange(0, 99999999)  # TODO: find out range for Zq!
     pass  # TODO: implement me!
 
 
-def Test(dsk, m):
+# outputs whether flag/ciphertext matches dsk (return bool)
+def Test(dsk: SecretKey, m) -> bool:
     # TODO: implement me!
     pass
