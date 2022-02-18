@@ -8,7 +8,7 @@ class Client:
     sk: SecretKey
 
     def __init__(self):
-        # TODO: find out which curve to use! 
+        # TODO: find out which curve to use!
         curve = Curve.get_curve('secp256k1')
         sk, pk = KeyGen(curve)
 
