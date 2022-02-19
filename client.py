@@ -7,6 +7,7 @@ class Client:
     pk: PublicKey
     sk: SecretKey
 
+    # generate a client and public private key pair
     def __init__(self, curve=None):
         if curve is None:
             curve = Curve.get_curve('secp256r1')
@@ -17,6 +18,3 @@ class Client:
 
     def get_seckey(self) -> SecretKey:
         return self.sk
-
-    def simulate(self):
-        pass  # TODO: implement me!

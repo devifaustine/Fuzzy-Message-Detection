@@ -13,10 +13,11 @@ class Server:
     def __init__(self, num: int, curve=None):
         if curve is None:
             self.curve = Curve.get_curve(curve_name)
-        # generate 20 clients
+        # generate num clients
         for i in range(num):
             self.clients[i] = Client()
 
+    # runs the FMD2 experiment with false positive rate p
     def run(self, p: float):
 
         # false positive rate p should be in form 1/(2^n)
@@ -37,6 +38,7 @@ class Server:
         false_pos = 0
         false_neg = 0
 
+        # test the flag for each client
         for i in range(len(self.clients)):
             client = self.clients[i]
             client_dsk = extract(client.get_seckey(), p)
@@ -51,4 +53,5 @@ class Server:
 
         # there should be no false negatives
         assert false_neg == 0
+        # the false positives should be at minimum p%
         assert false_pos/len(self.clients) >= p

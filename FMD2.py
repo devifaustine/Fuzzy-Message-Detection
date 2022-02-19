@@ -65,7 +65,7 @@ def keyGen(curve: Curve, numKeys=15):
     pk = PublicKey(numKeys)
 
     for i in range(numKeys):
-        randomNum = random.randrange(0, 9999999)  # TODO: find out range for Zq!
+        randomNum = random.randrange(0, q)  # TODO: find out range for Zq!
         sk.secKeys[i] = ECPrivateKey(randomNum, curve)
         pk.pubKeys[i] = sk.secKeys[i].get_public_key()
 
@@ -75,7 +75,7 @@ def keyGen(curve: Curve, numKeys=15):
 # generates detection key (dsk) from a secret key and false positive rate p
 def extract(sk: SecretKey, p: float):
     # p = false positive rate in form 2^(-n) with 0 <= n <= gamma (15).
-    n = int(math.log(1 / p, 2))
+    n = int(math.log(1/p, 2))
     result = []
     for i in range(n):
         result.append(sk.secKeys[i])
@@ -87,9 +87,9 @@ def extract(sk: SecretKey, p: float):
 def flag(pk: PublicKey, curve: Curve) -> Flag:
     pubKey = pk.pubKeys
     # tag:
-    r = random.randrange(0, 99999999)  # TODO: find out range for Zq!
+    r = random.randrange(0, q)  # TODO: find out range for Zq!
     ux, uy = curve.mul_point(r, generator)
-    z = random.randrange(0, 99999999)  # TODO: find out range for Zq!
+    z = random.randrange(0, q)  # TODO: find out range for Zq!
     wx, wy = curve.mul_point(z, generator)
 
     c = []
