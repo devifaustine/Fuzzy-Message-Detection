@@ -10,7 +10,7 @@ class Server:
     clients: list
     curve: Curve
 
-    def __init__(self, curve: Curve):
+    def __init__(self, curve=None):
         if curve is None:
             self.curve = Curve.get_curve(curve_name)
         # generate 20 clients
