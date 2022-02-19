@@ -28,16 +28,39 @@ class SecretKey:
         self.secKeys = sec
 
 
+class Flag:
+    u: Point
+    y: int  # TODO: determine int or float!
+    c: list
+
+    def __init__(self, u: Point, y: int, c: list):
+        if c is None:
+            self.c = []
+        self.u = u
+        self.y = y
+
+    def get_u(self):
+        return self.u
+
+    def get_y(self):
+        return self.y
+
+    def get_c(self):
+        return self.c
+
+
 # use NIST P-256 (FIPS 186-3)
 curve_name = 'secp256r1'
 # generator for curve secp256r1
 generator = Point(0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296,
                   0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5,
                   Curve.get_curve(curve_name))
+# TODO: determine the order of the group used!
+q = 9999999
 
 
 # generates a public and private key pair
-def KeyGen(curve: Curve, numKeys=15):
+def keyGen(curve: Curve, numKeys=15):
     sk = SecretKey(numKeys)
     pk = PublicKey(numKeys)
 
@@ -50,7 +73,7 @@ def KeyGen(curve: Curve, numKeys=15):
 
 
 # generates detection key (dsk) from a secret key and false positive rate p
-def Extract(sk: SecretKey, p: float):
+def extract(sk: SecretKey, p: float):
     # p = false positive rate in form 2^(-n) with 0 <= n <= gamma (15).
     n = int(math.log(1 / p, 2))
     result = []
@@ -60,8 +83,8 @@ def Extract(sk: SecretKey, p: float):
     return dsk
 
 
-# generates ciphertext on input public key
-def Flag(pk: PublicKey, curve: Curve):
+# generates ciphertext/flag on input public key
+def flag(pk: PublicKey, curve: Curve) -> Flag:
     pubKey = pk.pubKeys
     # tag:
     r = random.randrange(0, 99999999)  # TODO: find out range for Zq!
@@ -80,15 +103,34 @@ def Flag(pk: PublicKey, curve: Curve):
         c[i] = k[i] ^ 1
 
     m = hash_g(ux, uy, c)
-    pass
+    y = ((z - m) * pow(r, -1)) % q
+    result = Flag(Point(ux, uy, curve), y, c)
+    return result
 
 
 # outputs whether flag/ciphertext matches dsk (return bool)
-def Test(dsk: SecretKey, m) -> bool:
-    # TODO: implement me!
-    pass
+def test(curve: Curve, dsk: SecretKey, f: Flag) -> bool:
+    # TODO: Fix this accordingly!
+    key = dsk.secKeys
+    u = f.get_u()
+    y = f.get_y()
+    c = f.get_c()
+    message = hash_g(u.x, u.y, c)
+    # w = g^m * u^y --> TODO: find out how to compute thi
+    # TODO: this is wrongly implemented! Fix this!
+    w1 = curve.mul_point(message, generator)
+    w2 = curve.mul_point(y, u)
+    wx = w1.x * w2.x
+    wy = w1.y * w2.y
+    k = []
+
+    for i in range(dsk.numKeys):
+        hx, hy = curve.mul_point(key[i], u)
+        k[i] = hash_h(curve, u.x, u.y, hx, hy, wx, wy)
+    return False
 
 
+# encrypts a string using SHA256
 def encrypt_string(hash_string) -> bytes:
     sha_signature = hashlib.sha256(hash_string.encode()).digest()
     return sha_signature
