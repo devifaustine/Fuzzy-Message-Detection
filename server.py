@@ -18,7 +18,6 @@ class Server:
             self.clients[i] = Client()
 
     def run(self):
-        # TODO: implement server
 
         # false positive rate p
         p = pow(2, -10)
@@ -34,4 +33,16 @@ class Server:
         # creates flag
         f = flag(receiver.get_pubkey(), self.curve)
 
-        # TODO: use test() from FMD2 to check if flag is valid for each client (?)
+        # keeps track of test() results
+        true = 0
+        false = 0
+
+        for i in range(20):
+            client = self.clients[i]
+            client_dsk = extract(client.get_seckey(), p)
+            if test(self.curve, client_dsk, f):
+                true += 1
+            else:
+                false += 1
+
+        # TODO: check if false positive rate is true
