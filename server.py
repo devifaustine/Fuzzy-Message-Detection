@@ -33,14 +33,21 @@ class Server:
 
         # keeps track of test() results
         true = 0
-        false = 0
+        false_pos = 0
+        false_neg = 0
 
         for i in range(20):
             client = self.clients[i]
             client_dsk = extract(client.get_seckey(), p)
             if test(self.curve, client_dsk, f):
-                true += 1
+                if i == receiver_id:
+                    true += 1
+                else:
+                    false_pos += 1
             else:
-                false += 1
+                if i == receiver_id:
+                    false_neg += 1
 
-        # TODO: check if false positive rate is true
+        # there should be no false negatives
+        assert false_neg == 0
+        assert false_pos/len(self.clients) >= p
