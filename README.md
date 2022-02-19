@@ -1,6 +1,6 @@
 # Fuzzy-Message-Detection
 
-This repository contains code implementing the FMD2 algorithm according to the research paper Fuzzy Message Detection described in https://eprint.iacr.org/2021/089.pdf. For this implementation we are using pure python library for Elliptic Curve which is ECPy. 
+This repository contains code implementing the FMD2 algorithm according to the research paper Fuzzy Message Detection described in https://eprint.iacr.org/2021/089.pdf. For this implementation we are using pure python library for Elliptic Curve which is ECPy (source code: https://ec-python.readthedocs.io/en/latest/_modules/ecpy/curves.html). 
 
 The algorithm from the research paper will be implemented in the FMD2.py file. The main.py file basically runs the server (in server.py), which automatically simulates the FMD2 experiment. 
 
