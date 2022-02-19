@@ -7,8 +7,9 @@ class Client:
     pk: PublicKey
     sk: SecretKey
 
-    def __init__(self):
-        curve = Curve.get_curve('secp256r1')
+    def __init__(self, curve=None):
+        if curve is None:
+            curve = Curve.get_curve('secp256r1')
         sk, pk = keyGen(curve)
 
     def get_pubkey(self) -> PublicKey:
