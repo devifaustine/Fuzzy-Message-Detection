@@ -1,4 +1,5 @@
 # implement server of FMD scheme
+import math
 import random
 from client import Client
 from FMD2 import extract, test, flag, curve_name
@@ -9,23 +10,23 @@ class Server:
     clients: list
     curve: Curve
 
-    def __init__(self, curve=None):
+    def __init__(self, num: int, curve=None):
         if curve is None:
             self.curve = Curve.get_curve(curve_name)
         # generate 20 clients
-        for i in range(20):
+        for i in range(num):
             self.clients[i] = Client()
 
-    def run(self):
+    def run(self, p: float):
 
-        # false positive rate p
-        p = pow(2, -10)
+        # false positive rate p should be in form 1/(2^n)
+        assert (math.log(1/p, 2)) % 1 == 0
 
         # creates a sender
         sender = Client()
 
         # randomly choose one client as intended receiver
-        receiver_id = random.randint(0, 19)
+        receiver_id = random.randint(0, len(self.clients)-1)
         receiver = self.clients[receiver_id]
 
         # creates flag
@@ -36,7 +37,7 @@ class Server:
         false_pos = 0
         false_neg = 0
 
-        for i in range(20):
+        for i in range(len(self.clients)):
             client = self.clients[i]
             client_dsk = extract(client.get_seckey(), p)
             if test(self.curve, client_dsk, f):
