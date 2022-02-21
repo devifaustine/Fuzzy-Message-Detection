@@ -41,7 +41,8 @@ class Flag:
 
     def __init__(self, u: Point, y: int, c: list):
         if c is None:
-            self.c = []
+            c = []
+        self.c = c
         self.u = u
         self.y = y
 
@@ -75,7 +76,9 @@ def keyGen(curve: Curve, numKeys=15):
     for i in range(numKeys):
         randomNum = random.randrange(0, q)
         sk.add_seckey(ECPrivateKey(randomNum, curve))
+        print(str(sk.secKeys[i]))
         pk.add_pubkey(sk.secKeys[i].get_public_key())
+        print(str(pk.pubKeys[i]))
 
     return sk, pk
 
@@ -106,9 +109,10 @@ def flag(pk: PublicKey, curve: Curve) -> Flag:
     # gamma is set to 15
     for i in range(15):
         # according to GO implementation h = u^{sk_i}
-        hx, hy = curve.mul_point(pubKey[i], u)
-        k[i] = hash_h(curve, u.x, u.y, hx, hy, w.x, w.y)
-        c[i] = k[i] ^ 1
+        # h = pubKey * r
+        h = curve.mul_point(r, pubKey[i].W)
+        k.append(hash_h(curve, u.x, u.y, h.x, h.y, w.x, w.y))
+        c.append(k[i] ^ 1)
 
     m = hash_g(u.x, u.y, c)
     y = ((z - m) * pow(r, -1)) % q

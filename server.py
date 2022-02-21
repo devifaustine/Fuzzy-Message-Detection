@@ -43,7 +43,7 @@ class Server:
         # test the flag for each client
         for i in range(len(self.clients)):
             client = self.clients[i]
-            client_dsk = extract(client.get_seckey(), p)
+            client_dsk = extract(client.sk, p)
             if test(self.curve, client_dsk, f):
                 if i == receiver_id:
                     true += 1
