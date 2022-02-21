@@ -36,7 +36,7 @@ class SecretKey:
 
 class Flag:
     u: Point
-    y: int  # TODO: determine int or float!
+    y: int
     c: list
 
     def __init__(self, u: Point, y: int, c: list):

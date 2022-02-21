@@ -33,7 +33,7 @@ class Server:
         receiver = self.clients[receiver_id]
 
         # creates flag
-        f = flag(receiver.get_pubkey(), self.curve)
+        f = flag(receiver.pk, self.curve)
 
         # keeps track of test() results
         true = 0
