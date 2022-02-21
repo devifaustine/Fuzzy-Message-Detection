@@ -14,8 +14,9 @@ class Server:
         if curve is None:
             self.curve = Curve.get_curve(curve_name)
         # generate num clients
+        self.clients = []
         for i in range(num):
-            self.clients[i] = Client()
+            self.clients.append(Client())
 
     # runs the FMD2 experiment with false positive rate p
     def run(self, p: float):

@@ -51,12 +51,14 @@ class Flag:
 
 # use NIST P-256 (FIPS 186-3)
 curve_name = 'secp256r1'
+
 # generator for curve secp256r1
 generator = Point(0x6b17d1f2e12c4247f8bce6e563a440f277037d812deb33a0f4a13945d898c296,
                   0x4fe342e2fe1a7f9b8ee7eb4a7c0f9e162bce33576b315ececbb6406837bf51f5,
                   Curve.get_curve(curve_name))
-# TODO: determine the order of the group used!
-q = 9999999
+
+# order of group for curve 'secp256r1'
+q = 0xffffffff00000000ffffffffffffffffbce6faada7179e84f3b9cac2fc632551
 
 
 # generates a public and private key pair
@@ -65,9 +67,9 @@ def keyGen(curve: Curve, numKeys=15):
     pk = PublicKey(numKeys)
 
     for i in range(numKeys):
-        randomNum = random.randrange(0, q)  # TODO: find out range for Zq!
-        sk.secKeys[i] = ECPrivateKey(randomNum, curve)
-        pk.pubKeys[i] = sk.secKeys[i].get_public_key()
+        randomNum = random.randrange(0, q)
+        sk.secKeys.append(ECPrivateKey(randomNum, curve))
+        pk.pubKeys.append(sk.secKeys[i].get_public_key())
 
     return sk, pk
 
@@ -87,9 +89,9 @@ def extract(sk: SecretKey, p: float):
 def flag(pk: PublicKey, curve: Curve) -> Flag:
     pubKey = pk.pubKeys
     # tag:
-    r = random.randrange(0, q)  # TODO: find out range for Zq!
+    r = random.randrange(0, q)
     ux, uy = curve.mul_point(r, generator)
-    z = random.randrange(0, q)  # TODO: find out range for Zq!
+    z = random.randrange(0, q)
     wx, wy = curve.mul_point(z, generator)
 
     c = []
