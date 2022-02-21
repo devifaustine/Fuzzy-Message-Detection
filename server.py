@@ -12,7 +12,8 @@ class Server:
 
     def __init__(self, num: int, curve=None):
         if curve is None:
-            self.curve = Curve.get_curve(curve_name)
+            curve = Curve.get_curve(curve_name)
+        self.curve = curve
         # generate num clients
         self.clients = []
         for i in range(num):

@@ -2,7 +2,7 @@
 import math
 import random
 from ecpy.curves import Curve, Point
-from ecpy.keys import ECPrivateKey
+from ecpy.keys import ECPrivateKey, ECPublicKey
 import hashlib
 
 
@@ -16,6 +16,9 @@ class PublicKey:
         self.numKeys = num
         self.pubKeys = pub
 
+    def add_pubkey(self, pk: ECPublicKey):
+        self.pubKeys.append(pk)
+
 
 class SecretKey:
     numKeys: int
@@ -26,6 +29,9 @@ class SecretKey:
             sec = []
         self.numKeys = num
         self.secKeys = sec
+
+    def add_seckey(self, sk: ECPrivateKey):
+        self.secKeys.append(sk)
 
 
 class Flag:
@@ -68,8 +74,8 @@ def keyGen(curve: Curve, numKeys=15):
 
     for i in range(numKeys):
         randomNum = random.randrange(0, q)
-        sk.secKeys.append(ECPrivateKey(randomNum, curve))
-        pk.pubKeys.append(sk.secKeys[i].get_public_key())
+        sk.add_seckey(ECPrivateKey(randomNum, curve))
+        pk.add_pubkey(sk.secKeys[i].get_public_key())
 
     return sk, pk
 
@@ -77,7 +83,7 @@ def keyGen(curve: Curve, numKeys=15):
 # generates detection key (dsk) from a secret key and false positive rate p
 def extract(sk: SecretKey, p: float):
     # p = false positive rate in form 2^(-n) with 0 <= n <= gamma (15).
-    n = int(math.log(1/p, 2))
+    n = int(math.log(1 / p, 2))
     result = []
     for i in range(n):
         result.append(sk.secKeys[i])
@@ -90,9 +96,9 @@ def flag(pk: PublicKey, curve: Curve) -> Flag:
     pubKey = pk.pubKeys
     # tag:
     r = random.randrange(0, q)
-    ux, uy = curve.mul_point(r, generator)
+    u = curve.mul_point(r, generator)
     z = random.randrange(0, q)
-    wx, wy = curve.mul_point(z, generator)
+    w = curve.mul_point(z, generator)
 
     c = []
     k = []
@@ -100,13 +106,13 @@ def flag(pk: PublicKey, curve: Curve) -> Flag:
     # gamma is set to 15
     for i in range(15):
         # according to GO implementation h = u^{sk_i}
-        hx, hy = curve.mul_point(pubKey[i], Point(ux, uy, curve))
-        k[i] = hash_h(curve, ux, uy, hx, hy, wx, wy)
+        hx, hy = curve.mul_point(pubKey[i], u)
+        k[i] = hash_h(curve, u.x, u.y, hx, hy, w.x, w.y)
         c[i] = k[i] ^ 1
 
-    m = hash_g(ux, uy, c)
+    m = hash_g(u.x, u.y, c)
     y = ((z - m) * pow(r, -1)) % q
-    result = Flag(Point(ux, uy, curve), y, c)
+    result = Flag(u, y, c)
     return result
 
 

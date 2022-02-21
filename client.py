@@ -11,7 +11,7 @@ class Client:
     def __init__(self, curve=None):
         if curve is None:
             curve = Curve.get_curve('secp256r1')
-        sk, pk = keyGen(curve)
+        self.sk, self.pk = keyGen(curve)
 
     def get_pubkey(self) -> PublicKey:
         return self.pk
