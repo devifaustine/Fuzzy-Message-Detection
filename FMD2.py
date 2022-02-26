@@ -120,7 +120,7 @@ def flag(pk: PublicKey, curve: Curve) -> Flag:
         # according to GO implementation h = u^{sk_i}
         # h = pubKey * r
         h = curve.mul_point(r, pubKey[i].W)
-        k.append(hash_h(curve, u.x, u.y, h.x, h.y, w.x, w.y))
+        k.append(hash_h(curve, u, h, w))
         c.append(k[i] ^ 1)
 
     m = hash_g(u.x, u.y, c)
@@ -153,7 +153,7 @@ def test(curve: Curve, dsk: SecretKey, f: Flag) -> bool:
         pkr = curve.mul_point(key[i], u)
 
         # compute padding = H(pk_i || pkR || Z) XOR the i^th bit of c from Flag
-        padding = hash_h(curve, u.x, u.y, pkr.x, pkr.y, z.x, z.y)
+        padding = hash_h(curve, u, pkr, z)
         padding ^= c[i] & 0x01 # following GO implementation
 
         if padding == 0:
@@ -168,12 +168,13 @@ def encrypt_string(hash_string) -> bytes:
     return sha_signature
 
 
-def hash_h(curve: Curve, ux: int, uy: int, hx: int, hy: int, wx: int, wy: int):
-    string = str(ux) + str(uy) + str(hx) + str(hy) + str(wx) + str(wy)
+# compute hash function H(U, X, W) where U,X and W are points
+def hash_h(curve: Curve, u: Point, h: Point, w: Point):
+    string = str(u.x) + str(u.y) + str(h.x) + str(h.y) + str(w.x) + str(w.y)
     # returns a single bit of the resulting hash
     return encrypt_string(string)[0] & 0x01
 
 
+# returns an integer in range(0, group order - 1)
 def hash_g(ux: int, uy: int, c: list) -> int:
-    # returns an integer in range(0, group order - 1)
     return 0  # TODO: implement me!
