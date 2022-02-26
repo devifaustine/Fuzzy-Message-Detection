@@ -6,6 +6,15 @@ from ecpy.keys import ECPrivateKey, ECPublicKey
 import hashlib
 
 
+class GroupElement:
+    x: int
+    y: int
+
+    def __init__(self, x=0, y=0):
+        self.x = x
+        self.y = y
+
+
 class PublicKey:
     numKeys: int
     pubKeys: list
@@ -121,25 +130,36 @@ def flag(pk: PublicKey, curve: Curve) -> Flag:
 
 
 # outputs whether flag/ciphertext matches dsk (return bool)
+# default output of this function is True if the dsk has zero sub-keys,
+# then it will always return True
 def test(curve: Curve, dsk: SecretKey, f: Flag) -> bool:
-    # TODO: Fix this accordingly!
+    result = True
+
     key = dsk.secKeys
     u = f.get_u()
     y = f.get_y()
     c = f.get_c()
-    message = hash_g(u.x, u.y, c)
-    # w = g^m * u^y --> TODO: find out how to compute thi
-    # TODO: this is wrongly implemented! Fix this!
-    w1 = curve.mul_point(message, generator)
-    w2 = curve.mul_point(y, u)
-    wx = w1.x * w2.x
-    wy = w1.y * w2.y
-    k = []
 
+    # compute hash_G
+    message = hash_g(u.x, u.y, c)
+
+    # compute Z = mP + yU --> from implementation in GO
+    z = curve.mul_point(message, generator)
+    t = curve.mul_point(y, u)
+    z = curve.add_point(z, t)
+
+    # for each subkey 1...numKeys in the secret key, decrypt that bit
     for i in range(dsk.numKeys):
-        hx, hy = curve.mul_point(key[i], u)
-        k[i] = hash_h(curve, u.x, u.y, hx, hy, wx, wy)
-    return False
+        pkr = curve.mul_point(key[i], u)
+
+        # compute padding = H(pk_i || pkR || Z) XOR the i^th bit of c from Flag
+        padding = hash_h(curve, u.x, u.y, pkr.x, pkr.y, z.x, z.y)
+        padding ^= c[i] & 0x01 # following GO implementation
+
+        if padding == 0:
+            result = False
+
+    return result
 
 
 # encrypts a string using SHA256
