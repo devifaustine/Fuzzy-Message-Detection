@@ -12,7 +12,7 @@ except AssertionError:
     # can be triggered because there are false negatives,
     # p is not in the right form or false positive rate is false
     print("FMD2 experiment was unsuccessful!")
+    print("Experiment done :(, try again!")
 else:
     print("FMD2 experiment was successful!")
-finally:
     print("Experiment done :), try with other values!")

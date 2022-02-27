@@ -195,7 +195,6 @@ def hash_g(ux: int, uy: int, c: list) -> int:
 
         # concatenate an 'X' onto the end of string each time through this loop
         # this ensures that string is different each time we hash it
-
         if bit_hashed < size:
             string += "X"
 
