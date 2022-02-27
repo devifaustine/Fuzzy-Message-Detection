@@ -124,7 +124,7 @@ def flag(pk: PublicKey, curve: Curve) -> Flag:
         c.append(k[i] ^ 1)
 
     m = hash_g(u.x, u.y, c)
-    y = ((z - m) * pow(r, -1)) % q
+    y = ((z - m) * pow(r, -1, q)) % q
     result = Flag(u, y, c)
     return result
 
@@ -150,7 +150,7 @@ def test(curve: Curve, dsk: SecretKey, f: Flag) -> bool:
 
     # for each subkey 1...numKeys in the secret key, decrypt that bit
     for i in range(dsk.numKeys):
-        pkr = curve.mul_point(key[i], u)
+        pkr = curve.mul_point(key[i].d, u)
 
         # compute padding = H(pk_i || pkR || Z) XOR the i^th bit of c from Flag
         padding = hash_h(curve, u, pkr, z)
@@ -177,4 +177,8 @@ def hash_h(curve: Curve, u: Point, h: Point, w: Point):
 
 # returns an integer in range(0, group order - 1)
 def hash_g(ux: int, uy: int, c: list) -> int:
+    string = str(ux) + str(uy)
+    for i in c:
+        string += str(i)
+
     return 0  # TODO: implement me!
