@@ -53,6 +53,9 @@ class Server:
                 if i == receiver_id:
                     false_neg += 1
 
+        print("Supposed false positive rate: "+str(p*100)+"%")
+        print("False positive rate of this experiment: "+str(false_pos/len(self.clients)*100)+"%")
+
         # there should be no false negatives
         assert false_neg == 0
         # the false positives should be at minimum p%

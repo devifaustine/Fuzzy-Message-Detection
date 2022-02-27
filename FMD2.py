@@ -120,7 +120,7 @@ def flag(pk: PublicKey, curve: Curve) -> Flag:
         # according to GO implementation h = u^{sk_i}
         # h = pubKey * r
         h = curve.mul_point(r, pubKey[i].W)
-        k.append(hash_h(curve, u, h, w))
+        k.append(hash_h(u, h, w))
         c.append(k[i] ^ 1)
 
     m = hash_g(u.x, u.y, c)
@@ -153,8 +153,8 @@ def test(curve: Curve, dsk: SecretKey, f: Flag) -> bool:
         pkr = curve.mul_point(key[i].d, u)
 
         # compute padding = H(pk_i || pkR || Z) XOR the i^th bit of c from Flag
-        padding = hash_h(curve, u, pkr, z)
-        padding ^= c[i] & 0x01 # following GO implementation
+        padding = hash_h(u, pkr, z)
+        padding ^= c[i] & 0x01  # following GO implementation
 
         if padding == 0:
             result = False
@@ -169,7 +169,7 @@ def encrypt_string(hash_string) -> bytes:
 
 
 # compute hash function H(U, X, W) where U,X and W are points
-def hash_h(curve: Curve, u: Point, h: Point, w: Point):
+def hash_h(u: Point, h: Point, w: Point):
     string = str(u.x) + str(u.y) + str(h.x) + str(h.y) + str(w.x) + str(w.y)
     # returns a single bit of the resulting hash
     return encrypt_string(string)[0] & 0x01
@@ -177,8 +177,29 @@ def hash_h(curve: Curve, u: Point, h: Point, w: Point):
 
 # returns an integer in range(0, group order - 1)
 def hash_g(ux: int, uy: int, c: list) -> int:
+    # concatenate all values
     string = str(ux) + str(uy)
     for i in c:
         string += str(i)
 
-    return 0  # TODO: implement me!
+    # size of the supposed hashed value should be at least 64 bits too long
+    size = q.bit_length() + 64
+    result = b''
+    bit_hashed = 0
+
+    while bit_hashed < size:
+        # hash the serialized value and append to result
+        hashed = encrypt_string(string)
+        result += (hashed[:32])
+        bit_hashed = len(result) / 8
+
+        # concatenate an 'X' onto the end of string each time through this loop
+        # this ensures that string is different each time we hash it
+
+        if bit_hashed < size:
+            string += "X"
+
+    # cast the resulting byte array into integer and compute % q
+    res = int.from_bytes(result, "big") % q
+
+    return res
