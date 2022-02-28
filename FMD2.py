@@ -6,15 +6,6 @@ from ecpy.keys import ECPrivateKey, ECPublicKey
 import hashlib
 
 
-class GroupElement:
-    x: int
-    y: int
-
-    def __init__(self, x=0, y=0):
-        self.x = x
-        self.y = y
-
-
 class PublicKey:
     numKeys: int
     pubKeys: list
@@ -85,9 +76,9 @@ def keyGen(curve: Curve, numKeys=15):
     for i in range(numKeys):
         randomNum = random.randrange(0, q)
         sk.add_seckey(ECPrivateKey(randomNum, curve))
-        print(str(sk.secKeys[i]))
+        #  print(str(sk.secKeys[i]))
         pk.add_pubkey(sk.secKeys[i].get_public_key())
-        print(str(pk.pubKeys[i]))
+        #  print(str(pk.pubKeys[i]))
 
     return sk, pk
 
