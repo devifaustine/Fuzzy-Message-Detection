@@ -2,12 +2,12 @@
 from server import Server
 
 # instantiate a server, number of clients produced can be changed
-server = Server(100)
+server = Server(200)
 
 try:
     # run the server/FMD2 experiment,
     # false positive rate can be changed
-    server.run(1/16)
+    server.run(1/2)
 except AssertionError:
     # can be triggered because there are false negatives,
     # p is not in the right form or false positive rate is false

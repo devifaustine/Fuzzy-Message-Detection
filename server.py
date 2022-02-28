@@ -25,9 +25,6 @@ class Server:
         # false positive rate p should be in form 1/(2^n)
         assert (math.log(1/p, 2)) % 1 == 0
 
-        # creates a sender
-        sender = Client()
-
         # randomly choose one client as intended receiver
         receiver_id = random.randint(0, len(self.clients)-1)
         receiver = self.clients[receiver_id]
