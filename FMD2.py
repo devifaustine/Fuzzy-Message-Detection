@@ -108,7 +108,6 @@ def flag(pk: PublicKey, curve: Curve) -> Flag:
 
     # gamma is set to 15
     for i in range(15):
-        # according to GO implementation h = u^{sk_i}
         # h = pubKey * r
         h = curve.mul_point(r, pubKey[i].W)
         k.append(hash_h(u, h, w))
@@ -145,7 +144,7 @@ def test(curve: Curve, dsk: SecretKey, f: Flag) -> bool:
 
         # compute padding = H(pk_i || pkR || Z) XOR the i^th bit of c from Flag
         padding = hash_h(u, pkr, z)
-        padding ^= c[i] & 0x01  # following GO implementation
+        padding ^= c[i] & 0x01
 
         if padding == 0:
             result = False
